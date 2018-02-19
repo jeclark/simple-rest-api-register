@@ -8,6 +8,7 @@ class defaultAPI extends simpleAPI {
 
   public $idMap = array(
     'user' => true,
+    'event' => true
   );
 
 }

@@ -6,5 +6,4 @@ class user extends iuser {
 
 class entry extends smartObject {
   public $idField = 'id';
-  public $table = ‘entries’;
-};
+}

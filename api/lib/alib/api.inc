@@ -95,10 +95,15 @@ function defaultAPI($n, $s, $f, $l, $c) {
   }
   global $config, $widgetName, $defaultAPI;
   $defaultAPI = $config->defaultAPI;
+  
+//  print "Attempting to include api/".$defaultAPI.".inc\n<pre>";
   include_once("api/".$defaultAPI.".inc");
   $defaultAPI = Inflect::singularize($defaultAPI);
   $defaultAPI .= "API";
+//  echo $defaultAPI." - ".$widgetName."\n";
+  
   $widget = new $defaultAPI($widgetName);
+//  var_export($widget);
   $widget->json();
   exit;
 }

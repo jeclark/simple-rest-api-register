@@ -13,6 +13,7 @@ class simpleAPI extends anAPI {
 
 
   public function __construct($apiName) {
+ 
     $this->apiName = $apiName;
     $this->debug['defaultAPI'] = $this->apiName;
 
@@ -22,8 +23,9 @@ class simpleAPI extends anAPI {
       $idProp = $this->getIDProp();
 
       $this->filters[$idProp] =  array(FILTER_VALIDATE_INT);
-    }
-
+  //  } else {
+  //    echo "NO $apiName";
+    }      
     parent::__construct();
 
     if ($this->smartClass === false) {
@@ -113,8 +115,11 @@ class simpleAPI extends anAPI {
 
   protected function findAll() {
     $idProp = $this->getIDProp();
-
-    $q = $this->f->$idProp($this->request->id);
+    if ($this->request->id) {
+       $q = $this->f->$idProp($this->request->id);
+    } else {
+      $q = $this->f;
+    }   
     if ($this->remoteFilters) {
       $this->debug['filtered'] = array();
       foreach ($this->remoteFilters as $filter) {

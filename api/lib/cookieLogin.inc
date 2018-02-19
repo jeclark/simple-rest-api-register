@@ -72,8 +72,8 @@ class cookieLogin extends loginPrototype {
       setcookie($cookieUser, $form->username, time() + $cookieExpiry, $cookiePath, $cookieDomain, $cookieSecure);
       setcookie($cookieToken, $passwordHash, time() + $cookieExpiry , $cookiePath, $cookieDomain, $cookieSecure);
       //And reload the page:
-#      print "{success: true}";
- #     exit;
+      print "{success: true}";
+      exit;
       return $this->loggedIn;
     } else {
       $this->loggedIn = FALSE;
