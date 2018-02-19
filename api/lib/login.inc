@@ -8,11 +8,11 @@ abstract class loginPrototype extends anObject {
 }
 
 class dummyLogin extends loginPrototype {
-  
+
   public function __construct() {
     global $user;
     $user = new iuser(array(
-			    'userID' => 0,
+			    'userID' => 1,
 			    'loginName' => 'none',
 			    'gn' => 'Dummy',
 			    'sn' => 'User',

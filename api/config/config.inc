@@ -16,8 +16,8 @@ if ($environment == "dev") {
     /* Required Variables used by cookieLogin: */
 
     /* Use cookieLogin */
-    $loginModule = "cookieLogin";
-    //$loginModule = "dummyLogin";
+    //$loginModule = "cookieLogin";
+    $loginModule = "dummyLogin";
     $loginSafetyLevel = 2; //iform style safety level
 
     /* User Login Expiration Time */
@@ -53,7 +53,7 @@ if ($environment == "dev") {
   include_once('prod.dbinfo.inc');
   include_once('prod.pathinfo.inc');
 
-    
+
   /* Required Variables used by cookieLogin: */
 
     /* Use cookieLogin */
