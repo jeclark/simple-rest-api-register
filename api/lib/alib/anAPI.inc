@@ -133,9 +133,12 @@ class anAPI extends aWidget {
     }
     if (method_exists($this, $this->request->action)) {
       $method = $this->request->action;
+
     } else {
       $method = strtolower($_SERVER['REQUEST_METHOD']);
     }
+
+    $this->response['action'] = $method;
     $this->$method();
   }
 

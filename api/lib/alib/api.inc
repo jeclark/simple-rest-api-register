@@ -57,13 +57,13 @@ class api {
               $oldLev = error_reporting(0);
           global $widgetName;
           $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
-                          #  print('1Attempting to include: '.$widgetName);
+          //                  print('1Attempting to include: '."api/".$widgetName.".inc");
          include_once("api/".$widgetName.".inc");
          restore_error_handler();
          error_reporting($oldLev);
          $widgetName = Inflect::singularize($widgetName);
          $widgetName .= "API";
-//         print('Attempting to include2: '.$widgetName);
+         //print('Attempting to include2: '.$widgetName);
 
          $widget = new $widgetName;
             $widget->json();
@@ -71,12 +71,12 @@ class api {
         } else {
             global $widgetName;
             $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
-                          #     print('2Attempting to include: '.$widgetName);
+                               print('2Attempting to include: '.$widgetName);
            include_once("api/".$widgetName.".inc");
 
            $widgetName = Inflect::singularize($widgetName);
            $widgetName .= "API";
-         #  print('Attempting to include2: '.$widgetName);
+           print('Attempting to include2: '.$widgetName);
 
            $widget = new $widgetName;
               $widget->json();
@@ -95,13 +95,13 @@ function defaultAPI($n, $s, $f, $l, $c) {
   }
   global $config, $widgetName, $defaultAPI;
   $defaultAPI = $config->defaultAPI;
-  
-//  print "Attempting to include api/".$defaultAPI.".inc\n<pre>";
+
+ print "Attempting to include api/".$defaultAPI.".inc\n<pre>";
   include_once("api/".$defaultAPI.".inc");
   $defaultAPI = Inflect::singularize($defaultAPI);
   $defaultAPI .= "API";
-//  echo $defaultAPI." - ".$widgetName."\n";
-  
+  echo $defaultAPI." - ".$widgetName."\n";
+
   $widget = new $defaultAPI($widgetName);
 //  var_export($widget);
   $widget->json();

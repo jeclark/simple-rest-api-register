@@ -47,6 +47,7 @@ class idb extends mysqli
             $this->host = $args[2];
           }
 	try {
+    //mysqli_report(MYSQLI_REPORT_ALL);
 	  parent::__construct($this->host, $this->user, $this->pass, $this->db);
 	  if ($this->connect_error) {
 	    throw new idbConnection_Exception("MySQL Connection error (".$this->connect_errno.") : ".$this->connect_error, $this->connect_errno);
@@ -65,11 +66,12 @@ class idb extends mysqli
       }
 
     function query($query) {
+      return parent::query($query);
       try {
 	  if( !$this->real_query($query) ) {// returns true or false
 	    throw new idbQuery_Exception( "Query $query returned error: \"".$this->error."\"", $this->errno );
 	  }
-	  $result = new iRes($this); // build you subclass
+	  $result = new iRes($this); // build your subclass
 	return $result;
       } catch (Exception $e) {
       throw $e;
