@@ -15,76 +15,78 @@
  * @link
  */
 
- include_once('inflect.inc');
+include_once('inflect.inc');
 class api {
-     private $forbiddenExtensionsRegex = "/\.(inc|php|phps|php5|ihtml|js)$/";
-   public function __construct() {
-     global $user, $config, $db, $login;
+  private $forbiddenExtensionsRegex = "/\.(inc|php|phps|php5|ihtml|js)$/";
+  public function __construct() {
+    global $user, $config, $db, $login;
 
-        //    ini_set('display_errors', 1);
-        //  error_reporting(E_ALL);
+    //    ini_set('display_errors', 1);
+    //  error_reporting(E_ALL);
 
 
 
-      if (strstr($_SERVER['REQUEST_URI'],'?')) {
-        list($uri, $cruft) = explode('?', $_SERVER['REQUEST_URI']);
-      } else {
-        $uri = $_SERVER['REQUEST_URI'];
+    if (strstr($_SERVER['REQUEST_URI'],'?')) {
+      list($uri, $cruft) = explode('?', $_SERVER['REQUEST_URI']);
+    } else {
+      $uri = $_SERVER['REQUEST_URI'];
+    }
+
+    $uri = '/'. preg_replace('/^'. preg_quote($config->self, '/') . '/', '', $uri);
+    $fileInfo = explode('/', rtrim($uri, '/'));
+    $appdir = realpath(__DIR__.'/../');
+
+
+    if(file_exists($appdir.$uri) and ($_SERVER['SCRIPT_FILENAME']!=$appdir.$_SERVER['REQUEST_URI']) and ($_SERVER['REQUEST_URI']!="/") and !preg_match($this->forbiddenExtensionsRegex, $_SERVER['REQUEST_URI']) and !is_dir($appdir.$uri)){
+
+
+      $array = explode("/", $_SERVER['SCRIPT_NAME']);
+      $path1 = $appdir.$uri."/".$array[count($array)-1];
+      $path2 = preg_replace('/\/\//', '/', $path1);
+      $path3 = str_replace("\\", '/', __FILE__);
+
+      if ($path2 != $path3) {
+        list($url,$cruft2)=explode('?',$_SERVER['REQUEST_URI']);
+
+        include($appdir.$url);
+        exit();
       }
+    } else {
+      if ($config->defaultAPI != '') {
+        $oldEH = set_error_handler('defaultAPI');
+        $oldLev = error_reporting(0);
+        global $widgetName;
+        $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
+        //                  print('1Attempting to include: '."api/".$widgetName.".inc");
+        include_once("api/".$widgetName.".inc");
+        restore_error_handler();
+        error_reporting($oldLev);
+        $widgetName = Inflect::singularize($widgetName);
+	$apiName = $widgetName;
+        $apiName .= "API";
+        //print('Attempting to include2: '.$widgetName);
 
-      $uri = '/'. preg_replace('/^'. preg_quote($config->self, '/') . '/', '', $uri);
-      $fileInfo = explode('/', rtrim($uri, '/'));
-      $appdir = realpath(__DIR__.'/../');
+        $widget = new $apiName($widgetName);
+        $widget->json();
+        exit;
+      } else {
+        global $widgetName;
+        $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
+        print('2Attempting to include: '.$widgetName);
+        include_once("api/".$widgetName.".inc");
 
+        $widgetName = Inflect::singularize($widgetName);
+	$apiName = $widgetName;
+        $apiName .= "API";
+        print('Attempting to include2: '.$widgetName);
 
-         if(file_exists($appdir.$uri) and ($_SERVER['SCRIPT_FILENAME']!=$appdir.$_SERVER['REQUEST_URI']) and ($_SERVER['REQUEST_URI']!="/") and !preg_match($this->forbiddenExtensionsRegex, $_SERVER['REQUEST_URI']) and !is_dir($appdir.$uri)){
-
-
-            $array = explode("/", $_SERVER['SCRIPT_NAME']);
-            $path1 = $appdir.$uri."/".$array[count($array)-1];
-            $path2 = preg_replace('/\/\//', '/', $path1);
-            $path3 = str_replace("\\", '/', __FILE__);
-
-            if ($path2 != $path3) {
-                list($url,$cruft2)=explode('?',$_SERVER['REQUEST_URI']);
-
-                include($appdir.$url);
-                exit();
-            }
-        } else {
-            if ($config->defaultAPI != '') {
-              $oldEH = set_error_handler('defaultAPI');
-              $oldLev = error_reporting(0);
-          global $widgetName;
-          $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
-          //                  print('1Attempting to include: '."api/".$widgetName.".inc");
-         include_once("api/".$widgetName.".inc");
-         restore_error_handler();
-         error_reporting($oldLev);
-         $widgetName = Inflect::singularize($widgetName);
-         $widgetName .= "API";
-         //print('Attempting to include2: '.$widgetName);
-
-         $widget = new $widgetName;
-            $widget->json();
-            exit;
-        } else {
-            global $widgetName;
-            $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
-                               print('2Attempting to include: '.$widgetName);
-           include_once("api/".$widgetName.".inc");
-
-           $widgetName = Inflect::singularize($widgetName);
-           $widgetName .= "API";
-           print('Attempting to include2: '.$widgetName);
-
-           $widget = new $widgetName;
-              $widget->json();
-              exit;
-        }
-       }
-     }
-        }
+        $widget = new $apiName($widgetName);
+        $widget->json();
+        exit;
+      }
+    }
+  }
+}
 
 
 function defaultAPI($n, $s, $f, $l, $c) {
@@ -96,14 +98,14 @@ function defaultAPI($n, $s, $f, $l, $c) {
   global $config, $widgetName, $defaultAPI;
   $defaultAPI = $config->defaultAPI;
 
- print "Attempting to include api/".$defaultAPI.".inc\n<pre>";
+  print "Attempting to include api/".$defaultAPI.".inc\n<pre>";
   include_once("api/".$defaultAPI.".inc");
   $defaultAPI = Inflect::singularize($defaultAPI);
   $defaultAPI .= "API";
   echo $defaultAPI." - ".$widgetName."\n";
 
   $widget = new $defaultAPI($widgetName);
-//  var_export($widget);
+  //  var_export($widget);
   $widget->json();
   exit;
 }

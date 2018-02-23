@@ -14,8 +14,9 @@ class anAPI extends aWidget {
   public $defaultErrorMessage = 'Oh crap.';
   public $globalFilters = array();
   public $useRemoteFilters = false;
+  protected $responded = FALSE;
 
-  public function json($output, $utfSafe = FALSE, $exit = TRUE) {
+  public function json($output = FALSE, $utfSafe = FALSE, $exit = TRUE) {
     global $config;
     if ($config->debugConfig['debugLevel'] != DEBUG_OFF) {
       $this->response['debug'] = $this->debug;
@@ -26,7 +27,12 @@ class anAPI extends aWidget {
       }
       $this->error(500);
     } else {
-      parent::json($this->response,$utfSafe,$exit);
+      if ($output === FALSE) {
+	$output = $this->response;
+      }
+      
+      $this->responded = TRUE;
+      parent::json($output,$utfSafe,$exit);
     }
   }
 
@@ -81,13 +87,15 @@ class anAPI extends aWidget {
     $this->response['success'] = false;
     $this->response['code'] = $code;
     $this->response['message'] = $message;
-
+    
 
     global $config;
     if ($config->debugConfig['debugLevel'] != DEBUG_OFF) {
+      $this->debug['bt'] = debug_backtrace(false);
       $this->response['debug'] = $this->debug;
     }
-
+    $this->responded = TRUE;
+    
     parent::json($this->response);
   }
 
@@ -137,9 +145,15 @@ class anAPI extends aWidget {
     } else {
       $method = strtolower($_SERVER['REQUEST_METHOD']);
     }
-
-    $this->response['action'] = $method;
+    $this->debug['class'] = get_class($this);
+    //$this->response['action'] = $method;
     $this->$method();
+  }
+
+  function __destruct() {
+    if ($this->responded !== TRUE) {
+      $this->json(false, true, true);
+    }
   }
 
 

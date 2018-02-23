@@ -21,11 +21,11 @@ abstract class smartObject extends anObject {
   protected $serializeMethod = 'json'; // json or php
   protected $unserialized = array();
   /*
-    protected $format = array(
-      'string' => '', // a sprintf style format string
-      'vars' => array() // class variables;
-    );
-  */
+     protected $format = array(
+     'string' => '', // a sprintf style format string
+     'vars' => array() // class variables;
+     );
+   */
   protected $format = 'json'; // interpret as a json string when called as a string.
   public $vars = array();
 
@@ -58,58 +58,58 @@ abstract class smartObject extends anObject {
     }
   }
 
-    public function __set($name, $value)
-      {
-        if ($name == "sql") {
-          $this->sql = $value;
-          return;
-        }
-        if ($name == 'id' && $this->idField != 'id') {
-          $this->vars[$this->idField] = $value;
-        } else if (in_array($name, $this->serializedKeys)) {
-            $this->vars[$name] = $value;
-            $this->unserialized[$name] = TRUE;
-        } else if (in_array($name, array_keys($this->foreignKeys))) {
-          if (is_object($value) && ($value instanceof $this->foreignKeys[$name]['type'])) {
-            $this->vars[$this->foreignKeys[$name]['key']] = $value->id;
-            $this->foreignKeys[$name]['obj'] = $value;
-          }
-        } else {
-          $this->vars[$name] = $value;
-        }
+  public function __set($name, $value)
+  {
+    if ($name == "sql") {
+      $this->sql = $value;
+      return;
+    }
+    if ($name == 'id' && $this->idField != 'id') {
+      $this->vars[$this->idField] = $value;
+    } else if (in_array($name, $this->serializedKeys)) {
+      $this->vars[$name] = $value;
+      $this->unserialized[$name] = TRUE;
+    } else if (in_array($name, array_keys($this->foreignKeys))) {
+      if (is_object($value) && ($value instanceof $this->foreignKeys[$name]['type'])) {
+        $this->vars[$this->foreignKeys[$name]['key']] = $value->id;
+        $this->foreignKeys[$name]['obj'] = $value;
       }
+    } else {
+      $this->vars[$name] = $value;
+    }
+  }
 
 
   public function __get($name)
-      {
-        if ($name == 'id' && $this->idField != 'id') {
-          return $this->vars[$this->idField];
-      } else if (in_array($name, $this->serializedKeys)) {
-          if (is_array($this->vars[$name]) || is_object($this->vars[$name])) {
-              return $this->vars[$name];
-          }
-          if ($this->serializeMethod == 'php') {
-            $retval = unserialize($this->vars[$name]);
-          } else {
-            $retval = json_decode($this->vars[$name], TRUE);
-            if (is_array($retval) && count($retval) == 0) {
-                return null;
-            }
-          }
-          return $retval;
-        } else if (($name == 'errno' || $name == 'error') && ! in_array($name, array_keys($this->vars))) {
-          return $this->$name;
-        } else if (!is_array($this->foreignKeys[$name])) {
-          return $this->vars[$name];
-        } else {
-          if (!is_a($this->foreignKeys[$name]['obj'], 'smartObject')) {
-            $type = $this->foreignKeys[$name]['type'];
-            $fKey = $this->foreignKeys[$name]['key'];
-            $this->foreignKeys[$name]['obj'] = new $type($this->{$fKey}, $this->db);
-          }
-          return $this->foreignKeys[$name]['obj'];
+  {
+    if ($name == 'id' && $this->idField != 'id') {
+      return $this->vars[$this->idField];
+    } else if (in_array($name, $this->serializedKeys)) {
+      if (is_array($this->vars[$name]) || is_object($this->vars[$name])) {
+        return $this->vars[$name];
+      }
+      if ($this->serializeMethod == 'php') {
+        $retval = unserialize($this->vars[$name]);
+      } else {
+        $retval = json_decode($this->vars[$name], TRUE);
+        if (is_array($retval) && count($retval) == 0) {
+          return null;
         }
       }
+      return $retval;
+    } else if (($name == 'errno' || $name == 'error') && ! in_array($name, array_keys($this->vars))) {
+      return $this->$name;
+    } else if (!is_array($this->foreignKeys[$name])) {
+      return $this->vars[$name];
+    } else {
+      if (!is_a($this->foreignKeys[$name]['obj'], 'smartObject')) {
+        $type = $this->foreignKeys[$name]['type'];
+        $fKey = $this->foreignKeys[$name]['key'];
+        $this->foreignKeys[$name]['obj'] = new $type($this->{$fKey}, $this->db);
+      }
+      return $this->foreignKeys[$name]['obj'];
+    }
+  }
 
 
   public function __toString() {
@@ -126,16 +126,16 @@ abstract class smartObject extends anObject {
     }
   }
 
- public function toArray() {
-     $retval = array();
-     foreach (array_keys($this->vars) as $key) {
-         $retval[$key] = $this->__get($key);
-         if (is_a($retval[$key], 'smartObject')) {
-	 $retval[$key] = $retval[$key]->toArray();
-	}
-     }
-     return $retval;
- }
+  public function toArray() {
+    $retval = array();
+    foreach (array_keys($this->vars) as $key) {
+      $retval[$key] = $this->__get($key);
+      if (is_a($retval[$key], 'smartObject')) {
+	$retval[$key] = $retval[$key]->toArray();
+      }
+    }
+    return $retval;
+  }
 
   public function reset() {
     foreach ($this->vars as $key => $val) {
@@ -143,7 +143,7 @@ abstract class smartObject extends anObject {
     }
     foreach ($this->foreignKeys as $name => $arr) {
       unset($arr['obj']);
-        $arr['obj'] = NULL;
+      $arr['obj'] = NULL;
     }
   }
 
@@ -187,23 +187,23 @@ abstract class smartObject extends anObject {
       $sql .= '`'.preg_replace('/,/','` , `',implode(',', $keys)).'`';
       $sql .= ") values (";
       foreach ($this->vars as $key => $val) {
-          if (in_array($key, $this->serializedKeys)) {
-            if (!$this->unserialized[$key] || (!is_array($val) && !is_object($val))) {
-              if ($this->serializeMethod == 'php') {
-                $val = unserialize($val);
-              } else {
-                $val = json_decode($val, TRUE);
-              }
-            }
+        if (in_array($key, $this->serializedKeys)) {
+          if (!$this->unserialized[$key] || (!is_array($val) && !is_object($val))) {
             if ($this->serializeMethod == 'php') {
-              $val = serialize($val);
+              $val = unserialize($val);
             } else {
-              $val = json_encode($val);
-            }
-            if ($val == "" || $val == '""' || $val == "null" || $val == '"null"') {
-              $val = NULL;
+              $val = json_decode($val, TRUE);
             }
           }
+          if ($this->serializeMethod == 'php') {
+            $val = serialize($val);
+          } else {
+            $val = json_encode($val);
+          }
+          if ($val == "" || $val == '""' || $val == "null" || $val == '"null"') {
+            $val = NULL;
+          }
+        }
         $sql .= "'".$this->db->real_escape_string($val)."', ";
       }
       $sql = substr($sql, 0, -2);
@@ -230,7 +230,7 @@ abstract class smartObject extends anObject {
       $sql = "update `".$this->table."` set ";
       foreach ($this->foreignKeys as $fkey => $farray) {
         if (is_object($farray['obj']) && $farray['obj']->id) {
-            $this->vars[$farray['key']] = $farray['obj']->id;
+          $this->vars[$farray['key']] = $farray['obj']->id;
         }
       }
       foreach ($this->vars as $key => $val) {
@@ -266,7 +266,7 @@ abstract class smartObject extends anObject {
       if ($this->db->errno == 0) {
         return TRUE;
       } else {
-          $this->error = 'MySQL Error: '.$this->db->errno.' '.$this->db->error;
+        $this->error = 'MySQL Error: '.$this->db->errno.' '.$this->db->error;
         return FALSE;
       }
     }
@@ -519,6 +519,9 @@ class smartObjectFactory {
     if (!$db) { $db = $GLOBALS['db']; };
     if (!$query && $this->queryString != "") {
       $query = $this->queryString;
+    } else {
+     $db->real_query("SET GLOBAL sql_mode='', SESSION sql_mode=''");
+      
     }
     if ($db->real_query($query)) {
       $smartResult = new smartResult($db);
@@ -533,8 +536,8 @@ class smartObjectFactory {
     } else {
       $this->error = $db->error;
       $this->errorQuery = $queryString;
-    $this->queryString = "";
-    $this->numWheres = 0;
+      $this->queryString = "";
+      $this->numWheres = 0;
       return FALSE;
       // A real programmer would add exceptions here.
     }
@@ -554,7 +557,7 @@ class smartObjectFactory {
   }
 
   public function f($query = NULL, $db = NULL) {
-   return $this->query($query, $db);
+    return $this->query($query, $db);
   }
 
 }
@@ -568,7 +571,7 @@ abstract class smartObjectWithTags extends smartObject {
      `total` INT( 64 ) NOT NULL ,
      PRIMARY KEY ( `tag` )
      ) ENGINE = MYISAM ;
-  */
+   */
 
 
   /**
@@ -577,9 +580,9 @@ abstract class smartObjectWithTags extends smartObject {
 
   function addTag($tags) {
     if(preg_match('/[^\s]+/', $this->tags)) {
-        $array = explode(' | ', $this->tags);
+      $array = explode(' | ', $this->tags);
     } else {
-     $array = array();
+      $array = array();
     }
 
     if (!is_array($tags)) {
@@ -625,9 +628,9 @@ abstract class smartObjectWithTags extends smartObject {
     $this->tags = '';
     if (count($array) > 0 && $this->updateTagCounts) {
       foreach ($array as $tag) {
-          if (is_a($this->db, 'idb')) {
-            $res = $this->db->query("update tagCounts set `total` = `total` - 1 where `tag` = '$tag'");
-          }
+        if (is_a($this->db, 'idb')) {
+          $res = $this->db->query("update tagCounts set `total` = `total` - 1 where `tag` = '$tag'");
+        }
       }
     }
   }

@@ -66,7 +66,6 @@ class idb extends mysqli
       }
 
     function query($query) {
-      return parent::query($query);
       try {
 	  if( !$this->real_query($query) ) {// returns true or false
 	    throw new idbQuery_Exception( "Query $query returned error: \"".$this->error."\"", $this->errno );

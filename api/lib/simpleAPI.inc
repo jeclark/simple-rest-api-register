@@ -12,8 +12,7 @@ class simpleAPI extends anAPI {
   );
 
 
-  public function __construct($apiName) {
- 
+  public function __construct($apiName) {  
     $this->apiName = $apiName;
     $this->debug['defaultAPI'] = $this->apiName;
 
@@ -23,8 +22,6 @@ class simpleAPI extends anAPI {
       $idProp = $this->getIDProp();
 
       $this->filters[$idProp] =  array(FILTER_VALIDATE_INT);
-  //  } else {
-  //    echo "NO $apiName";
     }      
     parent::__construct();
 
@@ -56,7 +53,6 @@ class simpleAPI extends anAPI {
 
       $res = $q->query();
       $this->debug['sql'] = $q->lastQuery;
-
       if (is_object($res)) {
         $this->response['success'] = true;
         $this->response['data'] = array();
@@ -116,7 +112,7 @@ class simpleAPI extends anAPI {
   protected function findAll() {
     $idProp = $this->getIDProp();
     if ($this->request->id) {
-       $q = $this->f->$idProp($this->request->id);
+      $q = $this->f->$idProp($this->request->id);
     } else {
       $q = $this->f;
     }   
@@ -132,6 +128,7 @@ class simpleAPI extends anAPI {
     $this->debug['form'] = $this->request;
     $res = $q->query();
     $this->debug['sql'] = $q->lastQuery;
+    
     if (is_object($res)) {
       $this->response['success'] = true;
       $this->response['data'] = array();
@@ -142,6 +139,7 @@ class simpleAPI extends anAPI {
     } else {
       $this->response['success'] = false;
       $this->response['error'] = $q->error;
+      $this->response['errno'] = $q->errno;
     }
 
   }

@@ -39,7 +39,9 @@ if ($environment == "dev") {
 
     /* Use ssl only? */
     $cookieSecure = FALSE;
-
+  $debugConfig = array(
+    'debugLevel' => true
+  );
 
 } else if ($environment == "test") {
 
