@@ -6,9 +6,9 @@ class entryAPI extends simpleAPI {
 
   public function getTotalsByMonth() {
     global $user, $login;
-    
-    $sql = "SELECT tag, entrydate, SUM(amount) as total FROM entries GROUP BY tag, DATE_FORMAT(entrydate, '%Y-%m')";
-    // $sql = "SELECT * FROM `entries`";
+    $sql = "SELECT tag, entrydate, SUM(amount) as total FROM entries WHERE tag IN ('groceries', 'utilities', 'entertainment', 'gas', 'woodworking', 'restaurant') GROUP BY tag, DATE_FORMAT(entrydate, '%Y-%m') ORDER BY tag, entrydate DESC";
+    //$sql = "SELECT tag, entrydate, SUM(amount) as total FROM entries GROUP BY tag, DATE_FORMAT(entrydate, '%Y-%m')";
+    //$sql = "SELECT FROM `entries`";
     //$sql = "select * from entries where id >= 0";
     //$this->f->query("SET GLOBAL sql_mode='', SESSION sql_mode=''");
     $res = $this->f->query($sql);
