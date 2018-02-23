@@ -56,7 +56,12 @@ class api {
         $oldEH = set_error_handler('defaultAPI');
         $oldLev = error_reporting(0);
         global $widgetName;
-        $widgetName = $fileInfo[count($fileInfo)-1]; // drop the .json
+	//var_export($fileInfo);
+	$idx = array_search('api', $fileInfo) + 1;
+	if (count($fileInfo) > $idx && isset($fileInfo[$idx+1])) {
+	  $_GET['action'] = $fileInfo[$idx + 1];
+	}
+        $widgetName = $fileInfo[$idx]; // drop the .json
         //                  print('1Attempting to include: '."api/".$widgetName.".inc");
         include_once("api/".$widgetName.".inc");
         restore_error_handler();
